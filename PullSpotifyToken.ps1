@@ -21,7 +21,7 @@ $response = Invoke-RestMethod -Method Post -Uri "https://accounts.spotify.com/ap
 # Print full token without truncation
 $response.access_token
 
-$key = "`nAPI_KEY"
-$value = $response
+$key = "API_KEY"
+$value = $response.access_token
 $output = "$key=$value"
-Add-Content -Path ".env" -Value $output
+Set-Content -Path ".env" -Value $output
