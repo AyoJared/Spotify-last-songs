@@ -54,6 +54,19 @@ body {
     background-color: #282828;
 }
 
+.track-flex {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.album-art {
+    width: 64px;
+    height: 64px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
 .track-info strong {
     font-size: 1.1rem;
     color: #fff;

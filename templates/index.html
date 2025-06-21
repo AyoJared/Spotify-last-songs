@@ -2,34 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Spotify App</title>
+    <title>My Spotify Tracks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="hero">
-        <h1>🎧 Discover Your Top Tracks</h1>
-        <p>Powered by Spotify</p>
+        <h1>🎧 Top Spotify Tracks</h1>
+        <p>Album art, song title, and artist name</p>
     </div>
 
     <div class="tracks-section">
-        <h2>🔥 Top Songs</h2>
-        <ul class="track-list">
-            {% for track in tracks %}
-            <li class="track-card">
-                <div class="track-info">
-                    <strong>{{ track.name }}</strong><br>
-                    <span>{{ track.artist }}</span>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
+        <h2>🔥 Tracks</h2>
+        {% if tracks %}
+            <ul class="track-list">
+                {% for track in tracks %}
+                <li class="track-card">
+                    <div class="track-flex">
+                        {% if track.image_url %}
+                            <img class="album-art" src="{{ track.image_url }}" alt="Album Art">
+                        {% endif %}
+                        <div class="track-info">
+                            <strong>{{ track.name }}</strong><br>
+                            <span>{{ track.artist }}</span>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="text-align: center; color: #ccc;">No tracks available.</p>
+        {% endif %}
     </div>
 
     <footer>
-        Made with ❤️ by Jared
+        Built with ❤️ using Flask + Spotify
     </footer>
-
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

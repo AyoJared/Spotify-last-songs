@@ -24,4 +24,13 @@ $response.access_token
 $key = "API_KEY"
 $value = $response.access_token
 $output = "$key=$value"
-Set-Content -Path ".env" -Value $output
+
+$lines = Get-Content ".env"
+
+while ($lines.Count -lt 3) {
+    $lines += ""
+}
+
+$lines[2] = $output  # index 2 is the 3rd line
+
+Set-Content -Path ".env" -Value $lines

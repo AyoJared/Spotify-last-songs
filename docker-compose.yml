@@ -1,16 +1,50 @@
-# Use postgres/example user/password credentials
+version: '3.8'
 
 services:
-
   db:
-    image: postgres
-    restart: always
+    image: postgres:15
+    container_name: flask_pg_db
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: music_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: flask_app
+    command: flask run --host=0.0.0.0 --port=3000
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      FLASK_ENV: development
+      DB_USER: admin
+      DB_PASS: secret
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: music_db
+    depends_on:
+      db:
+        condition: service_healthy
 
   adminer:
     image: adminer
+    container_name: adminer
     restart: always
     ports:
-      - 8080:8080
+      - "8000:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
