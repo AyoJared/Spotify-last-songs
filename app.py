@@ -60,7 +60,7 @@ def add_track():
 
 @app.route("/tracks/<id>", methods=["PUT"])
 def update_track(id):
-    track = Track.query.get(id)
+    track = db.session.get(Track, id)    
     if not track:
         return jsonify({"error": "Track not found"}), 404
     data = request.json
@@ -72,7 +72,7 @@ def update_track(id):
 
 @app.route("/tracks/<id>", methods=["DELETE"])
 def delete_track(id):
-    track = Track.query.get(id)
+    track = db.session.get(Track, id)    
     if not track:
         return jsonify({"error": "Track not found"}), 404
     db.session.delete(track)
@@ -101,5 +101,6 @@ def initialize_database():
         else:
             print("📚 Tracks already exist — skipping preload.")
 
-initialize_database()
-app.run(host="0.0.0.0", port=3000, debug=True)
+if __name__ == "__main__":
+    initialize_database()
+    app.run(host="0.0.0.0", port=3000, debug=True)
