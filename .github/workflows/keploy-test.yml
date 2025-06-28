@@ -1,0 +1,67 @@
+name: Keploy API Testing
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  keploy-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: keployuser
+          POSTGRES_PASSWORD: keploypass
+          POSTGRES_DB: keploydb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_USER: keployuser
+      DB_PASS: keploypass
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: keploydb
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Install Keploy
+      run: |
+        curl -s https://raw.githubusercontent.com/keploy/keploy/main/install.sh | bash
+
+    - name: Record Keploy Tests
+      run: |
+        nohup keploy record --command "python app.py" > keploy_output.log 2>&1 &
+        sleep 15  # wait for app and Keploy to start
+        curl http://localhost:3000/tracks  # trigger one sample request
+
+    - name: Run Keploy Tests
+      run: |
+        keploy test -c "python app.py"
+
+    - name: Upload Keploy Reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: keploy-test-report
+        path: keploy/reports/
